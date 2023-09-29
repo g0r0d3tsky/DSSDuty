@@ -3,19 +3,17 @@ package config
 import (
 	"fmt"
 	"github.com/caarlos0/env/v6"
-	"time"
 )
 
 type Config struct {
 	Postgres struct {
-		Host              string `env:"POSTGRES_HOST,notEmpty"`
-		Port              string `env:"POSTGRES_PORT,notEmpty"`
-		User              string `env:"POSTGRES_USER,notEmpty"`
-		Password          string `env:"POSTGRES_PASSWORD,notEmpty"`
-		Database          string `env:"POSTGRES_DB,notEmpty"`
-		ConnectionTimeout time.Duration
+		Host     string `env:"POSTGRES_HOST,notEmpty"`
+		Port     string `env:"POSTGRES_PORT,notEmpty"`
+		User     string `env:"POSTGRES_USER,notEmpty"`
+		Password string `env:"POSTGRES_PASSWORD,notEmpty"`
+		Database string `env:"POSTGRES_DB,notEmpty"`
 	}
-	TelegramToken string
+	TelegramToken string `env:"TELEGRAM_BOT_TOKEN"`
 }
 
 func Read() (*Config, error) {
