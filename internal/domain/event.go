@@ -1,11 +1,14 @@
 package domain
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Event struct {
-	Id             int
-	UserId         int
-	DutyId         int
-	EventType      string
-	EventTimeStamp time.Time
+	Id        uuid.UUID
+	UserId    uuid.UUID
+	DutyId    uuid.UUID
+	Type      string
+	TimeStamp time.Time
 }

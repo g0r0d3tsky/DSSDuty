@@ -1,9 +1,12 @@
 package domain
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Duty struct {
-	Id     int
+	Id     uuid.UUID
 	Date   time.Time
-	UserId int
+	UserId uuid.UUID
 }
