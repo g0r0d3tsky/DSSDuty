@@ -16,6 +16,12 @@ type Config struct {
 	TelegramToken string `env:"TELEGRAM_BOT_TOKEN"`
 }
 
+func (c *Config) PostgresDSN() string {
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		c.Postgres.Host, c.Postgres.Port, c.Postgres.User, c.Postgres.Password, c.Postgres.Database,
+	)
+}
+
 func Read() (*Config, error) {
 	var config Config
 

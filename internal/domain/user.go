@@ -8,7 +8,8 @@ const (
 )
 
 type User struct {
-	Id       uuid.UUID
-	Username string
-	Role     string
+	Id         uuid.UUID
+	Username   string
+	Role       string
+	DutyAmount int
 }
