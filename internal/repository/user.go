@@ -7,9 +7,6 @@ import (
 )
 
 func (rw rw) CreateUser(ctx context.Context, u *domain.User) error {
-	if u == nil {
-		return nil
-	}
 	if _, err := rw.store.Exec(
 		ctx,
 		`INSERT INTO "USER" (id, username, duty_amount, role) VALUES ($1, $2, $3, $4)`,
@@ -24,19 +21,19 @@ func (rw rw) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, e
 
 	if err := rw.store.QueryRow(
 		ctx,
-		`SELECT * FROM "USER" u WHERE u.id = $1`, userID,
-	).Scan(&user.Id, &user.Username, &user.DutyAmount, &user.Role); err != nil {
+		`SELECT id, username, duty_amount, role, full_name, course FROM "USER" u WHERE u.id = $1`, userID,
+	).Scan(&user.Id, &user.Username, &user.DutyAmount, &user.Role, &user.FullName, &user.Course); err != nil {
 		return nil, err
 	}
 
 	return user, nil
 }
 
-func (rw rw) UpdateUser(ctx context.Context, userID uuid.UUID, role string, username string, dutyAmount int) error {
+func (rw rw) UpdateUser(ctx context.Context, user *domain.User) error {
 	if _, err := rw.store.Exec(
 		ctx,
-		`UPDATE "USER" SET role=$2, username=$3, duty_amount=$4 WHERE id=$1`,
-		userID, role, username, dutyAmount,
+		`UPDATE "USER" SET username=$2, duty_amount=$3, role=$4, full_name=$5, course=$6  WHERE id=$1`,
+		user.Id, user.Username, user.DutyAmount, user.Role, user.FullName, user.Course,
 	); err != nil {
 		return err
 	}

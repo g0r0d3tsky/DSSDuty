@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/domain"
 	"github.com/google/uuid"
-	"time"
 )
 
 func (rw rw) CreateRewardsSanctions(ctx context.Context, rewSan *domain.RewardsSanctions) error {
@@ -43,12 +42,11 @@ func (rw rw) GetRewardSanctionsByUserId(ctx context.Context, userId uuid.UUID) (
 
 	return rewSans, nil
 }
-func (rw rw) UpdateRewardsSanctionsByUserId(ctx context.Context, Id uuid.UUID, userId uuid.UUID,
-	rewards int, sanctions int, info string, time time.Time) error {
+func (rw rw) UpdateRewardsSanctionsByUserId(ctx context.Context, rewSan *domain.RewardsSanctions) error {
 	if _, err := rw.store.Exec(
 		ctx,
 		`UPDATE "RewardsSanctions" SET user_id=$2, rewards=$3, sanctions=$4, info=$5, timestamp=$6 WHERE id=$1`,
-		Id, userId, rewards, sanctions, info, time,
+		rewSan.Id, rewSan.UserId, rewSan.Rewards, rewSan.Sanctions, rewSan.Info,
 	); err != nil {
 		return err
 	}

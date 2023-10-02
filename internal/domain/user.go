@@ -12,4 +12,6 @@ type User struct {
 	Username   string
 	Role       string
 	DutyAmount int
+	FullName   string
+	Course     int
 }
