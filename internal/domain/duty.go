@@ -8,5 +8,11 @@ import (
 type Duty struct {
 	Id     uuid.UUID
 	Date   time.Time
-	UserId uuid.UUID
+	UserId UserId
+}
+
+// todo fix
+type UserId struct {
+	First  uuid.UUID
+	Second uuid.UUID
 }
