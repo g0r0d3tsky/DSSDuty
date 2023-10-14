@@ -16,6 +16,15 @@ func (rw rw) CreateUser(ctx context.Context, u *domain.User) error {
 	}
 	return nil
 }
+func (rw rw) CreateStimulation(ctx context.Context, user *domain.User) error {
+	if _, err := rw.store.Exec(ctx,
+		`INSERT INTO STIMULATION (id, user_id, rewards, sanctions, info, timestamp)
+ 				VALUES ($1, $2, $3, $4, $5, $6)`,
+		user.Stimulation[len(user.Stimulation)-1].Id, user.Id, user.Stimulation[len(user.Stimulation)-1].Rewards, user.Stimulation[len(user.Stimulation)-1].Sanctions, user.Stimulation[len(user.Stimulation)-1].Info, user.Stimulation[len(user.Stimulation)-1].DateTime); err != nil {
+		return err
+	}
+	return nil
+}
 func (rw rw) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error) {
 	user := &domain.User{}
 
@@ -45,6 +54,14 @@ func (rw rw) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 		`DELETE FROM "USER" WHERE id=$1`,
 		userID,
 	); err != nil {
+		return err
+	}
+	return nil
+}
+func (rw rw) DeleteStimulation(ctx context.Context, rewSanId uuid.UUID) error {
+	if _, err := rw.store.Exec(ctx,
+		`DELETE FROM STIMULATION WHERE id=$1`,
+		rewSanId); err != nil {
 		return err
 	}
 	return nil

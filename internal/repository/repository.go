@@ -15,9 +15,11 @@ type rw struct {
 // TODO: mock
 type User interface {
 	CreateUser(ctx context.Context, user *domain.User) error
+	CreateStimulation(ctx context.Context, user *domain.User) error
 	GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error)
 	UpdateUser(ctx context.Context, user *domain.User) error
 	DeleteUser(ctx context.Context, userID uuid.UUID) error
+	DeleteStimulation(ctx context.Context, rewSanId uuid.UUID) error
 }
 
 type Duty interface {
@@ -36,19 +38,11 @@ type Event interface {
 	DeleteEvent(ctx context.Context, eventID uuid.UUID) error
 }
 
-type RewardsSanctions interface {
-	CreateRewardsSanctions(ctx context.Context, rewSan *domain.RewardsSanctions) error
-	GetRewardSanctionsByUserId(ctx context.Context, userID uuid.UUID) ([]*domain.RewardsSanctions, error)
-	UpdateRewardsSanctionsByUserId(ctx context.Context, rewSan *domain.RewardsSanctions) error
-	DeleteRewardsSanctions(ctx context.Context, rewSanId uuid.UUID) error
-}
-
 // go:generate mockery --name ServiceRepository
 type ServiceRepository interface {
 	User
 	Duty
 	Event
-	RewardsSanctions
 }
 
 func New(dbPool *pgxpool.Pool) ServiceRepository {
