@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/caarlos0/env/v6"
+	"github.com/caarlos0/env/v9"
 )
 
 type Config struct {
@@ -26,8 +26,7 @@ func Read() (*Config, error) {
 	var config Config
 
 	if err := env.Parse(&config); err != nil {
-		return nil, fmt.Errorf("failed to parse config: %w", err)
+		return nil, fmt.Errorf("parse config: %w", err)
 	}
-
 	return &config, nil
 }

@@ -9,6 +9,7 @@ type Duty struct {
 	Id     uuid.UUID
 	Date   time.Time
 	UserId UserId
+	Amount int
 }
 
 // todo fix

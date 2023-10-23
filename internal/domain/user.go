@@ -10,6 +10,13 @@ const (
 	WORKER = "WORKER"
 )
 
+type Stimulation struct {
+	Id          uuid.UUID
+	Stimulation bool
+	Info        string
+	DateTime    time.Time
+}
+
 type User struct {
 	Id          uuid.UUID
 	Username    string
@@ -17,11 +24,5 @@ type User struct {
 	DutyAmount  int
 	FullName    string
 	Course      int
-	Stimulation []struct {
-		Id        uuid.UUID
-		Rewards   int
-		Sanctions int
-		Info      string
-		DateTime  time.Time
-	}
+	Stimulation []Stimulation
 }

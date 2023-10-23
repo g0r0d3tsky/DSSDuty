@@ -1,25 +1,22 @@
-package repository
+package service
 
 import (
 	"context"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/domain"
+	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 )
 
-type rw struct {
-	store *pgxpool.Pool
+type Auth interface {
+	AuthUser(ctx context.Context, username string) (string, error)
 }
-
-// TODO: mock
 type User interface {
 	CreateUser(ctx context.Context, user *domain.User) error
-	CreateStimulation(ctx context.Context, userID uuid.UUID, stimul *domain.Stimulation) error
+	CreateStimulation(ctx context.Context, userID uuid.UUID) error
 	GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error)
-	GetUsers(ctx context.Context) ([]*domain.User, error)
-	//GetStimulationByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Stimulation, error)
-	GetStimulationByPeriod(ctx context.Context, start time.Time, end time.Time, userID uuid.UUID) ([]*domain.Stimulation, error)
+	GetStimulationByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Stimulation, error)
+	GetStimulationForOneMonth(ctx context.Context, userID uuid.UUID) ([]*domain.Stimulation, error)
 	UpdateUser(ctx context.Context, user *domain.User) error
 	DeleteUser(ctx context.Context, userID uuid.UUID) error
 	DeleteStimulation(ctx context.Context, rewSanId uuid.UUID) error
@@ -37,18 +34,20 @@ type Event interface {
 	CreateEvent(ctx context.Context, event *domain.Event) error
 	GetEventsByType(ctx context.Context, eType string) ([]*domain.Event, error)
 	GetEventsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error)
-	GetEventsByPeriod(ctx context.Context, start time.Time, end time.Time) ([]*domain.Event, error)
+	GetEventsByOneMonth(ctx context.Context, start time.Time, end time.Time) ([]*domain.Event, error)
 	DeleteEvent(ctx context.Context, eventID uuid.UUID) error
 }
-
-type ServiceRepository interface {
+type ServiceUsecase interface {
 	User
 	Duty
 	Event
 }
+type uc struct {
+	serviceRepo repository.ServiceRepository
+}
 
-func New(dbPool *pgxpool.Pool) ServiceRepository {
-	return rw{
-		store: dbPool,
+func New(mr repository.ServiceRepository) *uc {
+	return &uc{
+		serviceRepo: mr,
 	}
 }
