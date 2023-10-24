@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/caarlos0/env/v9"
+	"strconv"
 )
 
 type Config struct {
@@ -14,12 +15,17 @@ type Config struct {
 		Database string `env:"POSTGRES_DB,notEmpty"`
 	}
 	TelegramToken string `env:"TELEGRAM_BOT_TOKEN"`
+	Address       string `env:"Address"`
+	Port          int    `env:"Port"`
 }
 
 func (c *Config) PostgresDSN() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		c.Postgres.Host, c.Postgres.Port, c.Postgres.User, c.Postgres.Password, c.Postgres.Database,
 	)
+}
+func (c *Config) ServerAddress() string {
+	return c.Address + ":" + strconv.Itoa(c.Port)
 }
 
 func Read() (*Config, error) {

@@ -17,7 +17,7 @@ CREATE TABLE "RewardsSanctions" (
   "user_id" UUID NOT NULL,
   "rewards" int,
   "sanctions" int,
-  "info" string,
+  "info" VARCHAR(255),
   "timestamp" TIMESTAMP
 );
 
