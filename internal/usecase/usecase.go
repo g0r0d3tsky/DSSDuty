@@ -8,9 +8,6 @@ import (
 	"time"
 )
 
-type Auth interface {
-	AuthUser(ctx context.Context, username string) (string, error)
-}
 type User interface {
 	CreateUser(ctx context.Context, user *domain.User) error
 	CreateStimulation(ctx context.Context, userID uuid.UUID) error
