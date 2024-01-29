@@ -12,6 +12,9 @@ type DutyUseCase struct {
 	repo repository.ServiceRepository
 }
 
+func (uc *DutyUseCase) GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*domain.Duty, error) {
+	return uc.repo.GetDutyByID(ctx, dutyID)
+}
 func (uc *DutyUseCase) CreateDuty(ctx context.Context, duty *domain.Duty) error {
 	return uc.repo.CreateDuty(ctx, duty)
 }

@@ -6,14 +6,14 @@ import (
 )
 
 type Duty struct {
-	Id     uuid.UUID
-	Date   time.Time
-	UserId UserId
-	Amount int
+	Id     uuid.UUID `json:"id"`
+	Date   time.Time `json:"date"`
+	UserId UserId    `json:"user_id"`
+	Amount int       `json:"amount"`
 }
 
 // todo fix
 type UserId struct {
-	First  uuid.UUID
-	Second uuid.UUID
+	First  uuid.UUID `json:"first"`
+	Second uuid.UUID `json:"second"`
 }

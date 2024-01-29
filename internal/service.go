@@ -7,9 +7,9 @@ import (
 )
 
 type Service struct {
-	duty  duty.DutyUseCase
-	user  user.UserUseCase
-	event event.EventUseCase
+	Duty  duty.DutyUseCase
+	User  user.UserUseCase
+	Event event.EventUseCase
 }
 
 //реализация всех методов, что в api/rest/service.go, по сути просто будешь дергать duty.SomeMethod()

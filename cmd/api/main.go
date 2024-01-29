@@ -2,13 +2,23 @@ package main
 
 import (
 	"fmt"
+	"github.com/g0r0d3tsky/DSSDutyBot/internal"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/config"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 	"log"
+	"net/http"
+	"os"
 	"time"
 )
+
+const version = "1.0.0"
+
+type app struct {
+	UC     *internal.Service
+	config *config.Config
+	logger *log.Logger
+}
 
 func main() {
 	err := godotenv.Load()
@@ -16,7 +26,6 @@ func main() {
 		log.Fatal(err)
 	}
 	c, err := config.Read()
-	fmt.Printf("tg:  %v    _+_+_+_+_+__++", c.TelegramToken)
 
 	if err != nil {
 		log.Println("failed to read config:", err.Error())
@@ -34,31 +43,19 @@ func main() {
 			dbPool.Close()
 		}
 	}()
-	//router := mux.NewRouter()
-	//srv := &http.Server{
-	//	Addr:         c.ServerAddress(),
-	//	Handler:      router,
-	//	ReadTimeout:  4,
-	//	WriteTimeout: 4,
-	//	IdleTimeout:  60,
-	//}
-	//ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	//defer stop()
-	//go func() {
-	//	if err := srv.ListenAndServe(); err != nil {
-	//		log.Fatal("failed to start server")
-	//	}
-	//}()
-	//
-	//log.Println("server started")
-	//<-ctx.Done()
-	//fmt.Println(c.TelegramToken)
-	bot, err := tgbotapi.NewBotAPI(c.TelegramToken)
-	if err != nil {
-		panic(err)
+	logger := log.New(os.Stdout, "", log.Ldate|log.LUTC)
+	app := &app{
+		config: c,
+		logger: logger,
 	}
-	time.Sleep(5 * time.Second)
 
-	bot.Debug = true
-
+	srv := &http.Server{
+		Addr:         fmt.Sprintf(":%d", c.Port),
+		Handler:      app.routes(),
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  time.Minute,
+	}
+	err = srv.ListenAndServe()
+	logger.Fatal(err)
 }

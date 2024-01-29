@@ -6,8 +6,8 @@ import (
 )
 
 type Event struct {
-	Id        uuid.UUID
-	UserId    uuid.UUID
-	Type      string
-	TimeStamp time.Time
+	Id        uuid.UUID `json:"id"`
+	UserId    uuid.UUID `json:"user_id"`
+	Type      string    `json:"type"`
+	TimeStamp time.Time `json:"time_stamp"`
 }

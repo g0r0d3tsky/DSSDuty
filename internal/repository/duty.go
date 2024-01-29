@@ -7,6 +7,19 @@ import (
 	"time"
 )
 
+func (rw rw) GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*domain.Duty, error) {
+	duty := &domain.Duty{}
+
+	if err := rw.store.QueryRow(
+		ctx,
+		`SELECT id, date, user_id1, user_id2, amount FROM "DUTY" u WHERE u.id = $1`, dutyID,
+	).Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second, &duty.Amount); err != nil {
+		return nil, err
+	}
+
+	return duty, nil
+}
+
 func (rw rw) CreateDuty(ctx context.Context, duty *domain.Duty) error {
 	_, err := rw.store.Exec(ctx,
 		`INSERT INTO "DUTY" (id, date, user_id1, user_id2) VALUES($1, $2, $3, $4)`,

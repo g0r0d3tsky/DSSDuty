@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/caarlos0/env/v9"
+	"github.com/caarlos0/env/v10"
 	"strconv"
 )
 
@@ -14,9 +14,8 @@ type Config struct {
 		Password string `env:"POSTGRES_PASSWORD,notEmpty"`
 		Database string `env:"POSTGRES_DB,notEmpty"`
 	}
-	TelegramToken string `env:"TELEGRAM_BOT_TOKEN"`
-	Address       string `env:"Address"`
-	Port          int    `env:"Port"`
+	Address string `env:"Address"`
+	Port    int    `env:"Port"`
 }
 
 func (c *Config) PostgresDSN() string {

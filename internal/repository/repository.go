@@ -27,6 +27,7 @@ type User interface {
 
 type Duty interface {
 	CreateDuty(ctx context.Context, duty *domain.Duty) error
+	GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*domain.Duty, error)
 	GetDutyByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Duty, error)
 	GetDutyByPeriod(ctx context.Context, userID uuid.UUID, start time.Time, end time.Time) ([]*domain.Duty, error)
 	UpdateDuty(ctx context.Context, duty *domain.Duty) error
