@@ -12,8 +12,8 @@ func (rw rw) GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*domain.Duty, e
 
 	if err := rw.store.QueryRow(
 		ctx,
-		`SELECT id, date, user_id1, user_id2, amount FROM "DUTY" u WHERE u.id = $1`, dutyID,
-	).Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second, &duty.Amount); err != nil {
+		`SELECT id, date, user_id1, user_id2 FROM "DUTY" u WHERE u.id = $1`, dutyID,
+	).Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second); err != nil {
 		return nil, err
 	}
 
@@ -36,7 +36,7 @@ func (rw rw) GetDutyByPeriod(ctx context.Context, userID uuid.UUID,
 
 	rows, err := rw.store.Query(
 		ctx,
-		`SELECT  id, date, user_id1, user_id2, amount FROM "DUTY" WHERE (user_id1=$1 OR user_id2=$2)
+		`SELECT  id, date, user_id1, user_id2 FROM "DUTY" WHERE (user_id1=$1 OR user_id2=$2)
 				AND date>=$3
 				AND date<=$4`,
 		userID, userID, start, end)
@@ -46,7 +46,7 @@ func (rw rw) GetDutyByPeriod(ctx context.Context, userID uuid.UUID,
 	for rows.Next() {
 		duty := &domain.Duty{}
 
-		if err := rows.Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second, &duty.Amount); err != nil {
+		if err := rows.Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second); err != nil {
 			return nil, err
 		}
 

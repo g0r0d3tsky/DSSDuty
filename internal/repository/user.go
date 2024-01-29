@@ -10,8 +10,8 @@ import (
 func (rw rw) CreateUser(ctx context.Context, u *domain.User) error {
 	if _, err := rw.store.Exec(
 		ctx,
-		`INSERT INTO "USER" (id, username, duty_amount, role) VALUES ($1, $2, $3, $4)`,
-		u.Id, u.Username, u.DutyAmount, u.Role,
+		`INSERT INTO "USER" (id, email, duty_amount, role) VALUES ($1, $2, $3, $4)`,
+		u.Id, u.Email, u.DutyAmount, u.Role,
 	); err != nil {
 		return err
 	}
@@ -31,8 +31,8 @@ func (rw rw) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, e
 
 	if err := rw.store.QueryRow(
 		ctx,
-		`SELECT id, username, duty_amount, role, full_name, course FROM "USER" u WHERE u.id = $1`, userID,
-	).Scan(&user.Id, &user.Username, &user.DutyAmount, &user.Role, &user.FullName, &user.Course); err != nil {
+		`SELECT id, email, duty_amount, role, full_name, course FROM "USER" u WHERE u.id = $1`, userID,
+	).Scan(&user.Id, &user.Email, &user.DutyAmount, &user.Role, &user.FullName, &user.Course); err != nil {
 		return nil, err
 	}
 
@@ -43,14 +43,14 @@ func (rw rw) GetUsers(ctx context.Context) ([]*domain.User, error) {
 
 	rows, err := rw.store.Query(
 		ctx,
-		`SELECT id, username, duty_amount, role, full_name, course FROM "USER"`)
+		`SELECT id, email, duty_amount, role, full_name, course FROM "USER"`)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		user := &domain.User{}
 
-		if err := rows.Scan(&user.Id, &user.Username, &user.DutyAmount, &user.Role, &user.FullName, &user.Course); err != nil {
+		if err := rows.Scan(&user.Id, &user.Email, &user.DutyAmount, &user.Role, &user.FullName, &user.Course); err != nil {
 			return nil, err
 		}
 
@@ -90,7 +90,7 @@ func (rw rw) GetStimulationByPeriod(ctx context.Context, start time.Time, end ti
 	rows, err := rw.store.Query(
 		ctx,
 		`SELECT stimulation.id, stimulation.info, stimulation.timestamp, 
-       stimulation.stimulation FROM "stimulation" WHERE (timestamp>=$1 AND timestamp<=$2 AND user_id=&3)`,
+       stimulation.stimulation FROM "STIMULATION" WHERE (timestamp>=$1 AND timestamp<=$2 AND user_id=&3)`,
 		start, end, userId)
 
 	if err != nil {
@@ -112,8 +112,8 @@ func (rw rw) GetStimulationByPeriod(ctx context.Context, start time.Time, end ti
 func (rw rw) UpdateUser(ctx context.Context, user *domain.User) error {
 	if _, err := rw.store.Exec(
 		ctx,
-		`UPDATE "USER" SET username=$2, duty_amount=$3, role=$4, full_name=$5, course=$6  WHERE id=$1`,
-		user.Id, user.Username, user.DutyAmount, user.Role, user.FullName, user.Course,
+		`UPDATE "USER" SET email=$2, duty_amount=$3, role=$4, full_name=$5, course=$6  WHERE id=$1`,
+		user.Id, user.Email, user.DutyAmount, user.Role, user.FullName, user.Course,
 	); err != nil {
 		return err
 	}
