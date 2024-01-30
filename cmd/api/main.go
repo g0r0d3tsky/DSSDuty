@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/g0r0d3tsky/DSSDutyBot/internal"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/config"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
+	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -15,7 +15,7 @@ import (
 const version = "1.0.0"
 
 type app struct {
-	UC     *internal.Service
+	UC     *usecase.Service
 	config *config.Config
 	logger *log.Logger
 }
@@ -32,7 +32,6 @@ func main() {
 
 		return
 	}
-
 	dbPool, err := repository.Connect(c)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -43,8 +42,12 @@ func main() {
 			dbPool.Close()
 		}
 	}()
+	repo := repository.New(dbPool)
 	logger := log.New(os.Stdout, "", log.Ldate|log.LUTC)
+
+	service := usecase.New(repo)
 	app := &app{
+		UC:     service,
 		config: c,
 		logger: logger,
 	}

@@ -9,18 +9,33 @@ import (
 )
 
 type UserUseCase struct {
-	repo repository.ServiceRepository
+	Repo repository.ServiceRepository
+}
+
+func (uc *UserUseCase) GetStimulationByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Stimulation, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (uc *UserUseCase) CreateUser(ctx context.Context, user *domain.User) error {
-	return uc.repo.CreateUser(ctx, user)
+	id := uuid.New()
+	user.Id = id
+	switch user.Course {
+	case 3:
+		user.DutyAmount = 4
+	case 4:
+		user.DutyAmount = 3
+	default:
+		user.DutyAmount = 5
+	}
+	return uc.Repo.CreateUser(ctx, user)
 }
 func (uc *UserUseCase) CreateStimulation(ctx context.Context, userID uuid.UUID, stimul *domain.Stimulation) error {
-	return uc.repo.CreateStimulation(ctx, userID, stimul)
+	return uc.Repo.CreateStimulation(ctx, userID, stimul)
 }
 
 func (uc *UserUseCase) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error) {
-	return uc.repo.GetUserByID(ctx, userID)
+	return uc.Repo.GetUserByID(ctx, userID)
 }
 func (uc *UserUseCase) GetStimulationForOneMonth(ctx context.Context, userID uuid.UUID) ([]*domain.Stimulation, error) {
 	currentTime := time.Now()
@@ -30,7 +45,7 @@ func (uc *UserUseCase) GetStimulationForOneMonth(ctx context.Context, userID uui
 	firstDayOfNextMonth := time.Date(nextMonth.Year(), nextMonth.Month(), 1, 0, 0, 0, 0, currentTime.Location())
 	lastDayOfMonth := firstDayOfNextMonth.Add(-time.Hour * 24)
 
-	st, err := uc.repo.GetStimulationByPeriod(ctx, firstDayOfMonth, lastDayOfMonth, userID)
+	st, err := uc.Repo.GetStimulationByPeriod(ctx, firstDayOfMonth, lastDayOfMonth, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -38,10 +53,10 @@ func (uc *UserUseCase) GetStimulationForOneMonth(ctx context.Context, userID uui
 
 }
 func (uc *UserUseCase) UpdateUser(ctx context.Context, user *domain.User) error {
-	return uc.repo.UpdateUser(ctx, user)
+	return uc.Repo.UpdateUser(ctx, user)
 }
 func (uc *UserUseCase) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	return uc.repo.DeleteUser(ctx, userID)
+	return uc.Repo.DeleteUser(ctx, userID)
 }
 func (uc *UserUseCase) DeleteStimulation(ctx context.Context, rewSanId uuid.UUID) error {
 	return uc.DeleteStimulation(ctx, rewSanId)

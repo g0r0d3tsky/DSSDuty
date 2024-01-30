@@ -2,18 +2,32 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/domain"
 	"github.com/google/uuid"
 	"time"
 )
 
+var (
+	ErrDuplicateEmail = errors.New("duplicate email")
+)
+
 func (rw rw) CreateUser(ctx context.Context, u *domain.User) error {
+	fmt.Println("Repo---------------------------------------------")
+	fmt.Printf(" /n %+v /n ", u)
 	if _, err := rw.store.Exec(
 		ctx,
-		`INSERT INTO "USER" (id, email, duty_amount, role) VALUES ($1, $2, $3, $4)`,
-		u.Id, u.Email, u.DutyAmount, u.Role,
+		`INSERT INTO "USER" (id, email, password_hash, activated, full_name, duty_amount, role, course) 
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+		&u.Id, &u.Email, &u.Password.Hash, &u.Activated, &u.FullName, &u.DutyAmount, &u.Role, &u.Course,
 	); err != nil {
-		return err
+		switch {
+		case err.Error() == `pq: duplicate key value violates unique constraint "USER_email_key"`:
+			return ErrDuplicateEmail
+		default:
+			return err
+		}
 	}
 	return nil
 }
@@ -58,6 +72,19 @@ func (rw rw) GetUsers(ctx context.Context) ([]*domain.User, error) {
 	}
 
 	return users, nil
+}
+
+func (rw rw) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+	user := &domain.User{}
+
+	if err := rw.store.QueryRow(
+		ctx,
+		`SELECT id, email, duty_amount, role, full_name, course FROM "USER" u WHERE u.email = $1`, email,
+	).Scan(&user.Id, &user.Email, &user.DutyAmount, &user.Role, &user.FullName, &user.Course); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 //	func (rw rw) GetStimulationByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Stimulation, error) {

@@ -9,17 +9,22 @@ import (
 )
 
 type DutyUseCase struct {
-	repo repository.ServiceRepository
+	Repo repository.ServiceRepository
+}
+
+func (uc *DutyUseCase) GetDutyByPeriod(ctx context.Context, userID uuid.UUID, start time.Time, end time.Time) ([]*domain.Duty, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (uc *DutyUseCase) GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*domain.Duty, error) {
-	return uc.repo.GetDutyByID(ctx, dutyID)
+	return uc.Repo.GetDutyByID(ctx, dutyID)
 }
 func (uc *DutyUseCase) CreateDuty(ctx context.Context, duty *domain.Duty) error {
-	return uc.repo.CreateDuty(ctx, duty)
+	return uc.Repo.CreateDuty(ctx, duty)
 }
 func (uc *DutyUseCase) GetDutyByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Duty, error) {
-	return uc.repo.GetDutyByUserID(ctx, userID)
+	return uc.Repo.GetDutyByUserID(ctx, userID)
 }
 func (uc *DutyUseCase) GetDutiesByMonth(ctx context.Context, userID uuid.UUID) ([]*domain.Duty, error) {
 	currentTime := time.Now()
@@ -29,7 +34,7 @@ func (uc *DutyUseCase) GetDutiesByMonth(ctx context.Context, userID uuid.UUID) (
 	firstDayOfNextMonth := time.Date(nextMonth.Year(), nextMonth.Month(), 1, 0, 0, 0, 0, currentTime.Location())
 	lastDayOfMonth := firstDayOfNextMonth.Add(-time.Hour * 24)
 
-	es, err := uc.repo.GetDutyByPeriod(ctx, userID, firstDayOfMonth, lastDayOfMonth)
+	es, err := uc.Repo.GetDutyByPeriod(ctx, userID, firstDayOfMonth, lastDayOfMonth)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +42,8 @@ func (uc *DutyUseCase) GetDutiesByMonth(ctx context.Context, userID uuid.UUID) (
 }
 
 func (uc *DutyUseCase) UpdateDuty(ctx context.Context, duty *domain.Duty) error {
-	return uc.repo.UpdateDuty(ctx, duty)
+	return uc.Repo.UpdateDuty(ctx, duty)
 }
 func (uc *DutyUseCase) DeleteDuty(ctx context.Context, dutyID uuid.UUID) error {
-	return uc.repo.DeleteDuty(ctx, dutyID)
+	return uc.Repo.DeleteDuty(ctx, dutyID)
 }
