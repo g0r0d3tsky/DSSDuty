@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (app *app) routes() *httprouter.Router {
+func (app *app) routes() http.Handler {
 	router := httprouter.New()
 
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
@@ -18,5 +18,5 @@ func (app *app) routes() *httprouter.Router {
 	router.HandlerFunc(http.MethodPost, "/v1/duties", app.createDutyHanler)
 	router.HandlerFunc(http.MethodGet, "/v1/duties/:id", app.showDutyHandler)
 	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
-	return router
+	return app.recoverPanic(router)
 }

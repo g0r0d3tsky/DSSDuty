@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/config"
+	"github.com/g0r0d3tsky/DSSDutyBot/internal/mailer"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase"
 	"github.com/joho/godotenv"
 	"log"
-	"net/http"
+	"log/slog"
 	"os"
-	"time"
 )
 
 const version = "1.0.0"
@@ -17,10 +17,14 @@ const version = "1.0.0"
 type app struct {
 	UC     *usecase.Service
 	config *config.Config
-	logger *log.Logger
+	logger *slog.Logger
+	mailer mailer.Mailer
 }
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -29,7 +33,6 @@ func main() {
 
 	if err != nil {
 		log.Println("failed to read config:", err.Error())
-
 		return
 	}
 	dbPool, err := repository.Connect(c)
@@ -43,22 +46,18 @@ func main() {
 		}
 	}()
 	repo := repository.New(dbPool)
-	logger := log.New(os.Stdout, "", log.Ldate|log.LUTC)
 
 	service := usecase.New(repo)
 	app := &app{
 		UC:     service,
 		config: c,
 		logger: logger,
+		mailer: mailer.New(c.SMTP.Host, c.SMTP.Port, c.SMTP.Username, c.SMTP.Password, c.SMTP.Sender),
 	}
 
-	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", c.Port),
-		Handler:      app.routes(),
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  time.Minute,
+	err = app.serve()
+	if err != nil {
+		logger.Error("running server", err)
 	}
-	err = srv.ListenAndServe()
-	logger.Fatal(err)
+
 }

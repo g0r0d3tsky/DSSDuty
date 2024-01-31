@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/domain"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/validator"
@@ -35,7 +34,6 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	v := validator.New()
-	fmt.Printf(" %+v", user)
 
 	err = app.UC.User.CreateUser(context.Background(), user)
 	if err != nil {
@@ -49,6 +47,12 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	go func() {
+		err = app.mailer.Send(user.Email, "user_welcome.tmpl", user)
+		if err != nil {
+			app.logger.Error("mailer", err)
+		}
+	}()
 	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)

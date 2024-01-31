@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/domain"
 	"github.com/google/uuid"
 	"time"
@@ -14,8 +13,6 @@ var (
 )
 
 func (rw rw) CreateUser(ctx context.Context, u *domain.User) error {
-	fmt.Println("Repo---------------------------------------------")
-	fmt.Printf(" /n %+v /n ", u)
 	if _, err := rw.store.Exec(
 		ctx,
 		`INSERT INTO "USER" (id, email, password_hash, activated, full_name, duty_amount, role, course) 

@@ -14,6 +14,13 @@ type Config struct {
 		Password string `env:"POSTGRES_PASSWORD,notEmpty"`
 		Database string `env:"POSTGRES_DB,notEmpty"`
 	}
+	SMTP struct {
+		Host     string `env:"SMTP_HOST"`
+		Port     int    `env:"SMTP_PORT"`
+		Username string `env:"SMTP_USERNAME"`
+		Password string `env:"SMTP_PASSWORD"`
+		Sender   string `env:"SMTP_SENDER"`
+	}
 	Address string `env:"Address"`
 	Port    int    `env:"Port"`
 }
