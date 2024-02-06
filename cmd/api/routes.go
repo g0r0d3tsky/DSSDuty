@@ -12,10 +12,8 @@ func (app *app) routes() http.Handler {
 
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
-	//router.ServeFiles("/static/*filepath", http.Dir("./ui/static"))
-
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/duties", app.createDutyHanler)
+	router.HandlerFunc(http.MethodPost, "/v1/duties", app.requireAdmin(app.createDutyHanler))
 	router.HandlerFunc(http.MethodGet, "/v1/duties/:id", app.showDutyHandler)
 	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
 	router.HandlerFunc(http.MethodPost, "/v1/tokens/authentication", app.createAuthTokenHandler)

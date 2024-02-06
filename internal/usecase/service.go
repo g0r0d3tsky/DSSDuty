@@ -3,6 +3,7 @@ package usecase
 import (
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/auth"
+	impl4 "github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/auth/impl"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/duty"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/duty/impl"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/event"
@@ -31,10 +32,12 @@ func New(repo repository.ServiceRepository) *Service {
 	event := impl3.EventUseCase{
 		Repo: repo,
 	}
+	auth := impl4.AuthUseCase{}
 	return &Service{
 		Duty:  &duty,
 		User:  &user,
 		Event: &event,
+		Auth:  &auth,
 	}
 }
 

@@ -1,4 +1,4 @@
-package Impl
+package impl
 
 import (
 	"errors"
@@ -13,12 +13,15 @@ const (
 	tokenTTL   = 12 * time.Hour
 )
 
+type AuthUseCase struct {
+}
+
 type tokenClaims struct {
 	jwt.RegisteredClaims
 	UserId uuid.UUID `json:"user_id"`
 }
 
-func GenerateToken(userID uuid.UUID) (string, error) {
+func (AU *AuthUseCase) GenerateToken(userID uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenTTL)),
@@ -30,7 +33,7 @@ func GenerateToken(userID uuid.UUID) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
-func ParseToken(accessToken string) (uuid.UUID, error) {
+func (AU *AuthUseCase) ParseToken(accessToken string) (uuid.UUID, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")

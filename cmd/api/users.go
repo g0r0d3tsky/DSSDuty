@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/domain"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/validator"
@@ -79,11 +80,17 @@ func (app *app) createAuthTokenHandler(w http.ResponseWriter, r *http.Request) {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
+	fmt.Printf("err: %w \n", err)
 	if !match {
 		app.invalidCredentialsResponse(w, r)
 		return
 	}
 	token, err := app.UC.Auth.GenerateToken(user.Id)
+	fmt.Printf("err: %e \n", err)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 
 	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token}, nil)
 	if err != nil {
