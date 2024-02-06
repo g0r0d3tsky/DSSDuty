@@ -13,6 +13,7 @@ const (
 	tokenTTL   = 12 * time.Hour
 )
 
+// TODO: fix that
 type AuthUseCase struct {
 }
 
