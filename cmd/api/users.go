@@ -57,5 +57,37 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
+}
+
+func (app *app) createAuthTokenHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+	user, err := app.UC.User.GetUserByEmail(context.Background(), input.Email)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+	match, err := user.Password.Matches(input.Password)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+	if !match {
+		app.invalidCredentialsResponse(w, r)
+		return
+	}
+	token, err := app.UC.Auth.GenerateToken(user.Id)
+
+	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 
 }

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/repository"
+	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/auth"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/duty"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/duty/impl"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/usecase/event"
@@ -14,6 +15,7 @@ type Service struct {
 	Duty  duty.DutyUseCase
 	User  user.UserUseCase
 	Event event.EventUseCase
+	Auth  auth.AuthUseCase
 }
 type UC struct {
 	Repo repository.ServiceRepository

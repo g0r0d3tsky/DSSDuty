@@ -36,7 +36,17 @@ func (uc *UserUseCase) CreateStimulation(ctx context.Context, userID uuid.UUID, 
 
 func (uc *UserUseCase) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error) {
 	return uc.Repo.GetUserByID(ctx, userID)
+
 }
+
+func (uc *UserUseCase) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+	user, err := uc.Repo.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (uc *UserUseCase) GetStimulationForOneMonth(ctx context.Context, userID uuid.UUID) ([]*domain.Stimulation, error) {
 	currentTime := time.Now()
 	firstDayOfMonth := time.Date(currentTime.Year(), currentTime.Month(), 1, 0, 0, 0, 0,

@@ -76,8 +76,8 @@ func (rw rw) GetUserByEmail(ctx context.Context, email string) (*domain.User, er
 
 	if err := rw.store.QueryRow(
 		ctx,
-		`SELECT id, email, duty_amount, role, full_name, course FROM "USER" u WHERE u.email = $1`, email,
-	).Scan(&user.Id, &user.Email, &user.DutyAmount, &user.Role, &user.FullName, &user.Course); err != nil {
+		`SELECT id, created_at, email, password_hash, activated, full_name, duty_amount, role, course FROM "USER" u WHERE u.email = $1`, email,
+	).Scan(&user.Id, &user.CreatedAt, &user.Email, &user.Password.Hash, &user.Activated, &user.FullName, &user.DutyAmount, &user.Role, &user.Course); err != nil {
 		return nil, err
 	}
 

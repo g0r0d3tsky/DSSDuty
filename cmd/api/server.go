@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -19,6 +21,7 @@ func (app *app) serve() error {
 		IdleTimeout:  time.Minute,
 	}
 
+	shutdownError := make(chan error)
 	go func() {
 		quit := make(chan os.Signal, 1)
 
@@ -29,7 +32,22 @@ func (app *app) serve() error {
 			"signal",
 			slog.String("caught signal", s.String()),
 		)
-		os.Exit(0)
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+
+		shutdownError <- srv.Shutdown(ctx)
 	}()
-	return srv.ListenAndServe()
+	err := srv.ListenAndServe()
+	if !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	err = <-shutdownError
+	if err != nil {
+		return err
+	}
+	app.logger.Info("stopped server", map[string]string{
+		"addr": srv.Addr,
+	})
+	return nil
+
 }
