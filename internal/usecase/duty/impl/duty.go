@@ -21,6 +21,7 @@ func (uc *DutyUseCase) GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*doma
 	return uc.Repo.GetDutyByID(ctx, dutyID)
 }
 func (uc *DutyUseCase) CreateDuty(ctx context.Context, duty *domain.Duty) error {
+
 	return uc.Repo.CreateDuty(ctx, duty)
 }
 func (uc *DutyUseCase) GetDutyByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.Duty, error) {

@@ -28,6 +28,7 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 		Email:     input.Email,
 		Activated: false,
 		Course:    input.Course,
+		Role:      domain.WORKER,
 	}
 	err = user.Password.Set(input.Password)
 	if err != nil {
@@ -39,7 +40,6 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	err = app.UC.User.CreateUser(context.Background(), user)
 	if err != nil {
 		switch {
-
 		case errors.Is(err, repository.ErrDuplicateEmail):
 			v.AddError("email", "a user with this email address already exists")
 			app.failedValidationResponse(w, r, v.Errors)
