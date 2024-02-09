@@ -25,7 +25,7 @@ func (app *app) recoverPanic(next http.Handler) http.Handler {
 	})
 }
 
-func (app *app) authenticate(next http.Handler) http.Handler {
+func (app *app) authenticate(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Vary", "Authorization")
 		authorizationHeader := r.Header.Get("Authorization")
@@ -54,19 +54,21 @@ func (app *app) authenticate(next http.Handler) http.Handler {
 		user, err := app.UC.User.GetUserByID(context.Background(), userID)
 		if err != nil {
 			app.badRequestResponse(w, r, err)
+			return
 		}
 		ctx := context.WithValue(r.Context(), "user", user)
-		r.WithContext(ctx)
+		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})
 }
 
-func (app *app) requireActivatedUser(next http.HandlerFunc) http.HandlerFunc {
+func (app *app) requireActivatedUser(next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, ok := r.Context().Value("user").(*domain.User)
 		if !ok {
 			app.badRequestResponse(w, r, errors.New("missing user value in request context"))
+			return
 		}
 
 		if !user.Activated {
@@ -93,6 +95,7 @@ func (app *app) requireAdmin(next http.HandlerFunc) http.HandlerFunc {
 		next.ServeHTTP(w, r)
 	})
 }
+
 func (app *app) rateLimit(next http.Handler) http.Handler {
 
 	type client struct {
@@ -118,22 +121,24 @@ func (app *app) rateLimit(next http.Handler) http.Handler {
 		}
 	}()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			app.serverErrorResponse(w, r, err)
-			return
-		}
-		mu.Lock()
-		if _, found := clients[ip]; !found {
-			clients[ip] = &client{limiter: rate.NewLimiter(2, 4)}
-		}
-		clients[ip].lastSeen = time.Now()
-		if !clients[ip].limiter.Allow() {
+		if app.config.Limiter.Enabled {
+			ip, _, err := net.SplitHostPort(r.RemoteAddr)
+			if err != nil {
+				app.serverErrorResponse(w, r, err)
+				return
+			}
+			mu.Lock()
+			if _, found := clients[ip]; !found {
+				clients[ip] = &client{limiter: rate.NewLimiter(rate.Limit(app.config.Limiter.Rps), app.config.Limiter.Burst)}
+			}
+			clients[ip].lastSeen = time.Now()
+			if !clients[ip].limiter.Allow() {
+				mu.Unlock()
+				app.rateLimitExceededResponse(w, r)
+				return
+			}
 			mu.Unlock()
-			app.rateLimitExceededResponse(w, r)
-			return
 		}
-		mu.Unlock()
 		next.ServeHTTP(w, r)
 	})
 }

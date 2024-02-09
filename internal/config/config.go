@@ -21,6 +21,11 @@ type Config struct {
 		Password string `env:"SMTP_PASSWORD"`
 		Sender   string `env:"SMTP_SENDER"`
 	}
+	Limiter struct {
+		Rps     float64 `env:"LIMITER_RPS"`
+		Burst   int     `env:"LIMITER_BURST"`
+		Enabled bool    `env:"LIMITER_ENABLED"`
+	}
 	Address string `env:"Address"`
 	Port    int    `env:"Port"`
 }

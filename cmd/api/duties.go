@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/g0r0d3tsky/DSSDutyBot/internal/domain"
 	"log"
 	"net/http"
@@ -19,15 +20,10 @@ func (app *app) createDutyHanler(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	//layout := "2006-01-02 15:04:05"
-	//date, err := time.Parse(layout, dateStr)
-	if err != nil {
-		// Обработка ошибки парсинга даты
-	} else {
-		// Используйте переменную date для работы с датой
-	}
+	fmt.Printf("value: %+v \n", input)
+
 	duty := &domain.Duty{
-		//Date:   ,
+		Date:   input.Date,
 		Amount: input.Amount,
 	}
 
