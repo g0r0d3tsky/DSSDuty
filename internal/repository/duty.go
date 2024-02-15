@@ -12,8 +12,9 @@ func (rw rw) GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*domain.Duty, e
 
 	if err := rw.store.QueryRow(
 		ctx,
-		`SELECT id, date, user_id1, user_id2 FROM "DUTY" u WHERE u.id = $1`, dutyID,
-	).Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second); err != nil {
+		`SELECT id, date, user_id1, user_id2, amount, picking_time_start, picking_time_end FROM "DUTY" u WHERE u.id = $1`, dutyID,
+	).Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second, &duty.Amount,
+		&duty.Picking.PickingTimeStart, &duty.Picking.PickingTimeEnd); err != nil {
 		return nil, err
 	}
 
@@ -22,8 +23,9 @@ func (rw rw) GetDutyByID(ctx context.Context, dutyID uuid.UUID) (*domain.Duty, e
 
 func (rw rw) CreateDuty(ctx context.Context, duty *domain.Duty) error {
 	_, err := rw.store.Exec(ctx,
-		`INSERT INTO "DUTY" (id, date, user_id1, user_id2) VALUES($1, $2, $3, $4)`,
-		duty.Id, duty.Date, duty.UserId.First, duty.UserId.Second,
+		`INSERT INTO "DUTY" (id, date, user_id1, user_id2, amount, picking_time_start, picking_time_end) VALUES($1, $2, $3, $4, $5)`,
+		&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second,
+		&duty.Amount, &duty.Picking.PickingTimeStart, &duty.Picking.PickingTimeEnd,
 	)
 	if err != nil {
 		return err
@@ -36,7 +38,7 @@ func (rw rw) GetDutyByPeriod(ctx context.Context, userID uuid.UUID,
 
 	rows, err := rw.store.Query(
 		ctx,
-		`SELECT  id, date, user_id1, user_id2 FROM "DUTY" WHERE (user_id1=$1 OR user_id2=$2)
+		`SELECT  id, date, user_id1, user_id2, amount, picking_time_start, picking_time_end FROM "DUTY" WHERE (user_id1=$1 OR user_id2=$2)
 				AND date>=$3
 				AND date<=$4`,
 		userID, userID, start, end)
@@ -46,7 +48,8 @@ func (rw rw) GetDutyByPeriod(ctx context.Context, userID uuid.UUID,
 	for rows.Next() {
 		duty := &domain.Duty{}
 
-		if err := rows.Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second); err != nil {
+		if err := rows.Scan(&duty.Id, &duty.Date, &duty.UserId.First, &duty.UserId.Second, &duty.Amount,
+			&duty.Picking.PickingTimeStart, &duty.Picking.PickingTimeEnd); err != nil {
 			return nil, err
 		}
 
@@ -62,7 +65,7 @@ func (rw rw) GetDutyByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.D
 
 	rows, err := rw.store.Query(
 		ctx,
-		`SELECT id, date, user_id1, user_id2 FROM "DUTY" WHERE (user_id1=$1 OR user_id2=$2)`,
+		`SELECT id, date, user_id1, user_id2, amount, picking_time_start, picking_time_end FROM "DUTY" WHERE (user_id1=$1 OR user_id2=$2)`,
 		userID, userID)
 
 	if err != nil {
@@ -71,7 +74,8 @@ func (rw rw) GetDutyByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.D
 	for rows.Next() {
 		duty := &domain.Duty{}
 
-		if err := rows.Scan(&duty.Id, &duty.UserId.First, &duty.UserId.Second, &duty.Date); err != nil {
+		if err := rows.Scan(&duty.Id, &duty.UserId.First, &duty.UserId.Second, &duty.Date, &duty.Amount,
+			&duty.Picking.PickingTimeStart, &duty.Picking.PickingTimeEnd); err != nil {
 			return nil, err
 		}
 
@@ -83,8 +87,10 @@ func (rw rw) GetDutyByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.D
 func (rw rw) UpdateDuty(ctx context.Context, duty *domain.Duty) error {
 	if _, err := rw.store.Exec(
 		ctx,
-		`UPDATE "DUTY" SET user_id1=$2, user_id2=$3, date=$4 WHERE id=$1`,
-		duty.Id, duty.UserId.First, duty.UserId.Second, duty.Date,
+		`UPDATE "DUTY" SET user_id1=$2, user_id2=$3, date=$4, amount=$5, picking_time_start=$6, picking_time_end=$7
+              WHERE id=$1`,
+		&duty.Id, &duty.UserId.First, &duty.UserId.Second, &duty.Date, &duty.Amount,
+		&duty.Picking.PickingTimeStart, &duty.Picking.PickingTimeEnd,
 	); err != nil {
 		return err
 	}

@@ -95,6 +95,21 @@ func (app *app) requireAdmin(next http.HandlerFunc) http.HandlerFunc {
 		next.ServeHTTP(w, r)
 	})
 }
+func (app *app) pickDuty(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, ok := r.Context().Value("user").(*domain.User)
+		if !ok {
+			app.badRequestResponse(w, r, errors.New("missing user value in request context"))
+		}
+
+		if user.Role != domain.ADMIN {
+			app.methodNotAllowedResponse(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
 
 func (app *app) rateLimit(next http.Handler) http.Handler {
 
